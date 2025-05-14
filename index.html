@@ -613,6 +613,27 @@
         
         const xAxis = g.append("g").attr("transform", `translate(0,${plotHeight})`).attr("class", "axis x-axis");
         const yAxis = g.append("g").attr("class", "axis y-axis");
+
+        // X-axis label
+        svg.append("text")
+          .attr("class", "axis-label")
+          .attr("text-anchor", "middle")
+          .attr("x", margin.left + plotWidth / 2)
+          .attr("y", height - 5)
+          .attr("fill", "#334155")
+          .style("font-size", "12px")
+          .text("Time (seconds)");
+
+        // Y-axis label
+        svg.append("text")
+          .attr("class", "axis-label")
+          .attr("text-anchor", "middle")
+          .attr("transform", `rotate(-90)`)
+          .attr("x", -(margin.top + plotHeight / 2))
+          .attr("y", 15)
+          .attr("fill", "#334155")
+          .style("font-size", "12px")
+          .text("Heart Rate (BPM)");
         
         // Legend setup
         function renderLegend() {
@@ -1170,5 +1191,9 @@
         // Initialize everything when the page loads
         window.addEventListener('DOMContentLoaded', loadData);
     </script>
+  <!-- Team Credits -->
+<footer class="text-center py-6 text-gray-600 text-sm">
+  <p>Created by Praveen Sharma, Chinmay Bharambe, Vedant Vardhaan, Ishaan Gosain</p>
+</footer>
 </body>
 </html>

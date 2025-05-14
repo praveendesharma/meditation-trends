@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meditation Heart Rate Visualization</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+    <style>
+        /* Base Styles */
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            scroll-behavior: smooth;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .section {
+            min-height: auto;
+            padding: 40px 0;
+            position: relative;
+        }
+        
+        /* Navigation */
+        .nav {
+            position: sticky;
+            top: 0;
+            background-color: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .nav-link {
+            padding: 15px;
+            color: #555;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            color: #3b82f6;
+        }
+        
+        /* Intro Section */
+        .intro {
+            background: linear-gradient(135deg, #e0f2fe, #dbeafe, #ede9fe);
+            border-radius: 15px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+        }
+        
+        /* Card Styles */
+        .card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            overflow: hidden;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Chart Styling */
+        .chart-container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        /* Line Chart */
+        .axis path,
+        .axis line {
+            stroke: #cbd5e1;
+        }
+        
+        .axis text {
+            fill: #475569;
+            font-size: 0.75rem;
+        }
+        
+        .person-line {
+            transition: all 0.3s ease;
+        }
+        
+        .person-line:hover {
+            stroke-width: 3;
+            opacity: 1;
+        }
+        
+        .tooltip {
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.95);
+            color: #1e293b;
+            padding: 8px 12px;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            pointer-events: none;
+            font-size: 12px;
+            z-index: 100;
+            display: none;
+        }
+        
+        /* Human Figure Container */
+        .figure-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 25px;
+            margin-top: 30px;
+        }
+        
+        .meditation-figure {
+            position: relative;
+            width: 200px;
+            height: 300px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px;
+            border-radius: 10px;
+            background-color: white;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .meditation-figure:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .figure-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+            text-align: center;
+        }
+        
+        .figure-info {
+            font-size: 14px;
+            color: #555;
+            margin-top: 10px;
+            text-align: center;
+        }
+        
+        .figure-svg {
+            width: 150px;
+            height: 180px;
+            margin: 0 auto;
+        }
+        
+        /* Heart Animation */
+        .heart {
+            fill: #ef4444;
+            transform-origin: center;
+            transition: all 0.1s ease-in-out;
+        }
+        
+        @keyframes heartbeat {
+            0% {
+                transform: scale(1);
+                fill: #ef4444;
+            }
+            15% {
+                transform: scale(1.3);
+                fill: #dc2626;
+            }
+            30% {
+                transform: scale(1);
+                fill: #ef4444;
+            }
+            45% {
+                transform: scale(1.2);
+                fill: #dc2626;
+            }
+            60% {
+                transform: scale(1);
+                fill: #ef4444;
+            }
+            100% {
+                transform: scale(1);
+                fill: #ef4444;
+            }
+        }
+        
+        /* Time Slider */
+        .time-slider-container {
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+        
+        .time-slider {
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        .slider-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .slider-control-btn {
+            padding: 8px 15px;
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        
+        .slider-control-btn:hover {
+            background-color: #2563eb;
+        }
+        
+        /* Filters */
+        .filter-container {
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+        }
+        
+        .filter-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #333;
+        }
+        
+        .technique-list {
+            max-height: 150px;
+            overflow-y: auto;
+            padding: 10px;
+            background-color: #f1f5f9;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+        
+        .technique-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .technique-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+            margin-right: 8px;
+        }
+        
+        /* Human Figure SVGs */
+        .human-head {
+            fill: #f1f5f9;
+            stroke: #475569;
+            stroke-width: 1.5;
+        }
+        
+        .human-body {
+            fill: #f1f5f9;
+            stroke: #475569;
+            stroke-width: 1.5;
+        }
+        
+        .human-limb {
+            fill: #f1f5f9;
+            stroke: #475569;
+            stroke-width: 1.5;
+        }
+        
+        /* Writeup Section */
+        .writeup {
+            line-height: 1.8;
+            color: #333;
+        }
+        
+        .writeup h2 {
+            margin-bottom: 20px;
+            color: #1e293b;
+        }
+        
+        .writeup h3 {
+            margin-top: 30px;
+            margin-bottom: 15px;
+            color: #334155;
+        }
+        
+        /* Progress Indicator */
+        .progress-indicator {
+            position: fixed;
+            top: 50%;
+            right: 20px;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 50;
+        }
+        
+        .progress-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #cbd5e1;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .progress-dot.active {
+            background-color: #3b82f6;
+            transform: scale(1.3);
+        }
+        
+        /* Animation Controls */
+        .animation-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .filter-sidebar {
+                order: -1;
+                margin-bottom: 20px;
+            }
+            
+            .meditation-figure {
+                width: 160px;
+                height: 260px;
+            }
+            
+            .figure-svg {
+                width: 120px;
+                height: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="container mx-auto py-2">
+            <div class="flex justify-between items-center">
+                <h1 class="text-2xl font-bold text-gray-800">Meditation Heart Rate</h1>
+                <div class="flex space-x-4">
+                    <a href="#intro" class="nav-link">Introduction</a>
+                    <a href="#visualization" class="nav-link">Heart Rate</a>
+                    <a href="#figures" class="nav-link">Meditation Figures</a>
+                    <a href="#writeup" class="nav-link">Analysis</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Progress Indicator -->
+    <div class="progress-indicator hidden md:flex">
+        <a href="#intro" class="progress-dot active"></a>
+        <a href="#visualization" class="progress-dot"></a>
+        <a href="#figures" class="progress-dot"></a>
+        <a href="#writeup" class="progress-dot"></a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container mx-auto">
+        <!-- Intro Section -->
+        <section id="intro" class="section">
+            <div class="intro">
+                <h2 class="text-3xl font-semibold text-gray-800 mb-4">Exploring Your Heart Rate During Meditation</h2>
+                <p class="text-lg text-gray-700 mb-6">
+                    Welcome to the heart rate visualization tool! This interactive dashboard helps you track how your heart rate varies during different meditation sessions. By analyzing this data, you can gain valuable insights into how various techniques affect your body's physical state.
+                </p>
+                <p class="text-lg text-gray-700 mb-6">
+                    Here's what you can explore:
+                </p>
+                <ul class="list-disc list-inside text-lg text-gray-700">
+                    <li><strong>Heart Rate Trends:</strong> Track how heart rate changes throughout meditation sessions</li>
+                    <li><strong>Meditation Techniques:</strong> Compare different meditation styles and their effects</li>
+                    <li><strong>Interactive Figures:</strong> See human silhouettes with beating hearts that match actual BPM data</li>
+                    <li><strong>Real-time Animation:</strong> Use the time slider to see how heart rate evolves during sessions</li>
+                </ul>
+                <p class="text-lg text-gray-700 mt-6">
+                    Scroll down to explore the fascinating relationship between meditation techniques and your heart rate!
+                </p>
+            </div>
+            
+            <!-- Down Arrow -->
+            <div class="flex justify-center mt-4 animate-bounce">
+                <a href="#visualization" class="text-blue-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                    </svg>
+                </a>
+            </div>
+        </section>
+
+        <!-- Visualization Section -->
+        <section id="visualization" class="section">
+            <h2 class="text-2xl font-bold text-center mb-6">Heart Rate Trends During Meditation</h2>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Sidebar -->
+                <div class="filter-sidebar space-y-6">
+                    <!-- Techniques -->
+                    <div class="filter-container">
+                        <h3 class="filter-title">Techniques</h3>
+                        <div id="techniqueSelect" class="technique-list"></div>
+                    </div>
+
+                    <!-- Gender Filter -->
+                    <div class="filter-container">
+                        <label for="genderSelect" class="filter-title">Gender</label>
+                        <select id="genderSelect" class="w-full p-2 border border-gray-300 rounded bg-white text-sm">
+                            <option value="All">All</option>
+                            <option value="M">Male</option>
+                            <option value="F">Female</option>
+                        </select>
+                    </div>
+
+                    <!-- Display Mode -->
+                    <div class="filter-container">
+                        <h3 class="filter-title">Display Mode</h3>
+                        <div class="space-y-2 text-sm">
+                            <label class="flex items-center gap-2">
+                                <input type="radio" name="viewMode" value="all" checked class="form-radio text-blue-600" />
+                                All Participants
+                            </label>
+                            <label class="flex items-center gap-2">
+                                <input type="radio" name="viewMode" value="average" class="form-radio text-blue-600" />
+                                Average
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Insights -->
+                    <div class="filter-container">
+                        <h3 class="filter-title">Insights</h3>
+                        <ul id="insightList" class="list-disc list-inside text-sm text-gray-700 space-y-2"></ul>
+                    </div>
+                </div>
+
+                <!-- Chart Section -->
+                <div class="lg:col-span-2">
+                    <div class="chart-container fade-in">
+                        <div id="legend" class="flex flex-wrap gap-3 justify-center text-xs mb-4"></div>
+                        <svg id="chart" width="100%" height="420" class="w-full"></svg>
+                    </div>
+                    
+                    <!-- Time Slider -->
+                    <div class="time-slider-container">
+                        <div class="animation-controls">
+                            <div>
+                                <h3 class="text-lg font-semibold">Time Control</h3>
+                                <p class="text-sm text-gray-600">Use the slider to see heart rate changes over time</p>
+                            </div>
+                            <div class="slider-controls">
+                                <button id="playButton" class="slider-control-btn">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    Play
+                                </button>
+                                <button id="resetButton" class="slider-control-btn">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                    </svg>
+                                    Reset
+                                </button>
+                            </div>
+                        </div>
+                        <input type="range" id="timeSlider" class="time-slider" min="0" max="100" value="0">
+                        <div class="flex justify-between text-sm text-gray-600 mt-1">
+                            <span>Start</span>
+                            <span id="currentTimeDisplay">Time: 0</span>
+                            <span>End</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Meditation Figures Section -->
+        <section id="figures" class="section">
+            <h2 class="text-2xl font-bold text-center mb-6">Meditation Figures & Heart Rates</h2>
+            <p class="text-center text-gray-600 mb-8">Watch how heart rates vary across different meditation techniques</p>
+            
+            <!-- Human Figures with Beating Hearts -->
+            <div id="figureContainer" class="figure-container"></div>
+        </section>
+
+        <!-- Final Writeup -->
+        <section id="writeup" class="section writeup mb-20">
+            <h2 class="text-2xl font-bold mb-4 text-slate-900">📘 Analysis: Heart Rate Trends During Meditation</h2>
+            
+            <h3 class="text-xl font-semibold mt-6 mb-2 text-slate-800">🧭 Motivation</h3>
+            <p>
+                The goal of this visualization was to explore how heart rate patterns vary across different meditation techniques,
+                and whether factors like gender identity influence these trends. Meditation is often associated with physical
+                and emotional regulation, and this visualization provides a data-driven exploration of these effects.
+            </p>
+            
+            <h3 class="text-xl font-semibold mt-6 mb-2 text-slate-800">🎨 Visualization Design</h3>
+            <p>
+                We use a line chart to show heart rate fluctuations over time for each individual, enabling temporal analysis
+                while revealing person-specific variation. Additionally, the human figure visualization provides an intuitive
+                representation of how heart rate varies across different meditation techniques in real-time.
+            </p>
+            <ul class="list-disc pl-6 mt-2">
+                <li>Line chart shows BPM trends over time with interactive hover details</li>
+                <li>Human figures represent different meditation techniques</li>
+                <li>Animated hearts beat at rates corresponding to actual BPM data</li>
+                <li>Time slider allows for exploration of changes throughout sessions</li>
+            </ul>
+            
+            <h3 class="text-xl font-semibold mt-6 mb-2 text-slate-800">🔧 Data Transformations</h3>
+            <p>
+                Data is filtered dynamically based on selected meditation techniques and gender. Transformations include:
+            </p>
+            <ul class="list-disc pl-6 mt-2">
+                <li>Filtering by technique and gender</li>
+                <li>Aggregation when average view is enabled</li>
+                <li>Time-based animation transformations for the beating hearts</li>
+                <li>Statistical calculations for insights (averages, trends, comparisons)</li>
+            </ul>
+            
+            <h3 class="text-xl font-semibold mt-6 mb-2 text-slate-800">🧠 Findings & Insights</h3>
+            <p>
+                The visualization reveals several interesting patterns about how different meditation techniques affect heart rate:
+            </p>
+            <ul class="list-disc pl-6 mt-2">
+                <li>Some techniques (like Chi meditation) tend to produce more stable heart rates</li>
+                <li>Other techniques show more variation throughout the session</li>
+                <li>Gender differences exist in how heart rate responds to certain techniques</li>
+                <li>Individual variation is significant, highlighting the personalized nature of meditation</li>
+            </ul>
+            
+            <h3 class="text-xl font-semibold mt-6 mb-2 text-slate-800">🧑‍💻 Development Process</h3>
+            <p>
+                The visualization was built using D3.js and modern web technologies with a focus on interaction design:
+            </p>
+            <ol class="list-decimal pl-6 mt-2">
+                <li>Data preprocessing and analysis</li>
+                <li>Design of two complementary visualizations (line chart and human figures)</li>
+                <li>Implementation of interactive filtering and controls</li>
+                <li>Development of the heart beat animation algorithms to match real BPM data</li>
+            </ol>
+        </section>
+    </div>
+
+    <script>
+        // Global variables
+        let fullData = [];
+        let selectedTechniques = new Set();
+        let currentGender = "All";
+        let currentViewMode = "all";
+        let selectedLineId = null;
+        let currentTimeIndex = 0;
+        let animation = null;
+        let maxTime = 0;
+        
+        // Color mapping for techniques
+        const colorMap = {
+            "Chi": "#3b82f6",       // Blue
+            "Kundalini": "#8b5cf6", // Purple
+            "Spontaneous": "#10b981", // Green
+            "Metronomic": "#ef4444",  // Red
+            "Athlete": "#f59e0b"    // Orange
+        };
+        
+        // Setup line chart SVG
+        const svg = d3.select("#chart");
+        const width = +svg.node().getBoundingClientRect().width;
+        const height = +svg.attr("height");
+        const margin = { top: 30, right: 60, bottom: 40, left: 60 };
+        const plotWidth = width - margin.left - margin.right;
+        const plotHeight = height - margin.top - margin.bottom;
+        
+        const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+        const tooltip = d3.select("body").append("div").attr("class", "tooltip");
+        
+        // Setup scales and line generator
+        const x = d3.scaleLinear().range([0, plotWidth]);
+        const y = d3.scaleLinear().range([plotHeight, 0]);
+        
+        const line = d3.line()
+            .x(d => x(d.time))
+            .y(d => y(d.bpm))
+            .curve(d3.curveCatmullRom.alpha(0.5));
+        
+        const xAxis = g.append("g").attr("transform", `translate(0,${plotHeight})`).attr("class", "axis x-axis");
+        const yAxis = g.append("g").attr("class", "axis y-axis");
+        
+        // Legend setup
+        function renderLegend() {
+            const legend = d3.select("#legend");
+            legend.selectAll("div").remove();
+            
+            Object.entries(colorMap).forEach(([tech, color]) => {
+                const item = legend.append("div").attr("class", "flex items-center gap-2");
+                item.append("span")
+                    .style("background-color", color)
+                    .style("width", "16px")
+                    .style("height", "16px")
+                    .style("border-radius", "4px")
+                    .style("display", "inline-block");
+                item.append("span").text(tech);
+            });
+        }
+        
+        // Insights panel update
+        function renderInsights() {
+            const insightList = d3.select("#insightList");
+            insightList.selectAll("*").remove();
+            
+            if (selectedLineId !== null) {
+                const singleData = fullData.filter(d => d.person_id === selectedLineId);
+                if (singleData.length === 0) return;
+                
+                const bpmVals = singleData.map(d => d.bpm);
+                const duration = d3.max(singleData, d => d.time) - d3.min(singleData, d => d.time);
+                
+                insightList.append("li").text(`Participant: ${selectedLineId}`);
+                insightList.append("li").text(`Technique: ${singleData[0].technique}`);
+                insightList.append("li").text(`Avg BPM: ${d3.mean(bpmVals).toFixed(1)}`);
+                insightList.append("li").text(`Min BPM: ${d3.min(bpmVals).toFixed(1)}`);
+                insightList.append("li").text(`Max BPM: ${d3.max(bpmVals).toFixed(1)}`);
+                insightList.append("li").text(`Duration: ${duration.toFixed(1)} seconds`);
+                return;
+            }
+            
+            const filtered = fullData.filter(d =>
+                (selectedTechniques.size === 0 || selectedTechniques.has(d.technique)) &&
+                (currentGender === "All" || d.gender === currentGender)
+            );
+            
+            if (filtered.length === 0) {
+                insightList.append("li").text("No data available for the selected filters.");
+                return;
+            }
+            
+            const groupedByPerson = d3.groups(filtered, d => d.person_id);
+            const groupedByTechnique = d3.groups(filtered, d => d.technique);
+            const avgByTechnique = groupedByTechnique.map(([tech, values]) => ({
+                tech,
+                avg: d3.mean(values, d => d.bpm)
+            }));
+            
+            const max = d3.max(avgByTechnique, d => d.avg);
+            const min = d3.min(avgByTechnique, d => d.avg);
+            const highest = avgByTechnique.find(d => d.avg === max);
+            const lowest = avgByTechnique.find(d => d.avg === min);
+            const allBpms = filtered.map(d => d.bpm);
+            const range = [d3.min(allBpms), d3.max(allBpms)];
+            
+            insightList.append("li").text(`Number of participants: ${groupedByPerson.length}`);
+            insightList.append("li").text(`Heart rate range: ${range[0].toFixed(1)} - ${range[1].toFixed(1)} bpm`);
+            insightList.append("li").text(`Technique with highest average: ${highest.tech} (${highest.avg.toFixed(1)} bpm)`);
+            insightList.append("li").text(`Technique with lowest average: ${lowest.tech} (${lowest.avg.toFixed(1)} bpm)`);
+            
+            // Additional insights based on time point
+            const currentTimeData = filtered.filter(d => Math.round(d.time) === currentTimeIndex);
+            if (currentTimeData.length > 0) {
+                const currentAvg = d3.mean(currentTimeData, d => d.bpm).toFixed(1);
+                insightList.append("li").text(`Current time point avg: ${currentAvg} bpm`);
+            }
+        }
+        
+        // Line chart update function
+        function updateChart() {
+            const filtered = fullData.filter(d =>
+                (selectedTechniques.size === 0 || selectedTechniques.has(d.technique)) &&
+                (currentGender === "All" || d.gender === currentGender)
+            );
+            
+            let lineData;
+            if (currentViewMode === "all") {
+                lineData = d3.groups(filtered, d => d.person_id);
+            } else {
+                const grouped = d3.groups(filtered, d => d.technique);
+                lineData = grouped.map(([tech, records]) => {
+                    const averaged = d3.groups(records, d => d.time).map(([time, group]) => ({
+                        technique: tech,
+                        gender: group[0].gender,
+                        person_id: `avg-${tech}`,
+                        time: +time,
+                        bpm: d3.mean(group, d => d.bpm)
+                    }));
+                    return [tech, averaged];
+                });
+            }
+            
+            if (selectedLineId !== null) {
+                lineData = lineData.filter(d => d[0] === selectedLineId);
+            }
+            
+            const allTimes = filtered.map(d => d.time);
+            const allBpms = filtered.map(d => d.bpm);
+            x.domain(d3.extent(allTimes));
+            y.domain([d3.min(allBpms) - 5, d3.max(allBpms) + 5]);
+            
+            xAxis.transition().duration(750).call(d3.axisBottom(x));
+            yAxis.transition().duration(750).call(d3.axisLeft(y));
+            
+            const lines = g.selectAll(".person-line").data(lineData, d => d[0]);
+            
+            lines.enter()
+                .append("path")
+                .attr("class", "person-line")
+                .attr("stroke", d => colorMap[d[1][0].technique] || "#999")
+                .attr("stroke-width", currentViewMode === "average" ? 3 : 1.8)
+                .attr("fill", "none")
+                .attr("opacity", 0)
+                .attr("d", d => line(d[1]))
+                .transition().duration(750)
+                .attr("opacity", 0.7);
+            
+            lines.transition().duration(750)
+                .attr("stroke", d => colorMap[d[1][0].technique] || "#999")
+                .attr("stroke-width", currentViewMode === "average" ? 3 : 1.8)
+                .attr("d", d => line(d[1]));
+            
+            lines.exit().transition().duration(500).attr("opacity", 0).remove();
+            
+            const hoverLines = g.selectAll(".hover-line").data(lineData, d => d[0]);
+            
+            hoverLines.enter()
+                .append("path")
+                .attr("class", "hover-line")
+                .attr("stroke", "transparent")
+                .attr("stroke-width", 20)
+                .attr("fill", "none")
+                .style("cursor", "pointer")
+                .attr("d", d => line(d[1]))
+                .on("mouseover", function (event, d) {
+                    if (selectedLineId !== null) return;
+                    
+                    g.selectAll(".person-line").transition().duration(200).attr("opacity", 0.1);
+                    g.selectAll(".person-line").filter(ld => ld[0] === d[0])
+                        .transition().duration(200)
+                        .attr("stroke-width", 3)
+                        .attr("opacity", 1);
+                    
+                    tooltip
+                        .style("display", "block")
+                        .html(`<strong>Technique:</strong> ${d[1][0].technique}<br/>
+                               <strong>Gender:</strong> ${d[1][0].gender}<br/>
+                               <strong>${d[0].startsWith('avg') ? 'Average Line' : 'Person'}:</strong> ${d[0]}`);
+                })
+                .on("mousemove", function (event) {
+                    tooltip.style("left", (event.pageX + 12) + "px").style("top", (event.pageY - 28) + "px");
+                })
+                .on("mouseout", function () {
+                    if (selectedLineId !== null) return;
+                    g.selectAll(".person-line")
+                        .transition().duration(300)
+                        .attr("stroke-width", d => currentViewMode === "average" ? 3 : 1.8)
+                        .attr("opacity", 0.7);
+                    tooltip.style("display", "none");
+                })
+                .on("click", function (event, d) {
+                    selectedLineId = d[0];
+                    event.stopPropagation(); // prevent SVG background click
+                    updateChart();
+                    updateMeditationFigures();
+                });
+            
+            hoverLines.transition().duration(750).attr("d", d => line(d[1]));
+            hoverLines.exit().transition().duration(500).remove();
+            
+            renderInsights();
+            
+            // Add time indicator line
+            g.select(".time-indicator").remove();
+            if (currentTimeIndex > 0) {
+                const timePos = x(currentTimeIndex);
+                g.append("line")
+                    .attr("class", "time-indicator")
+                    .attr("x1", timePos)
+                    .attr("y1", 0)
+                    .attr("x2", timePos)
+                    .attr("y2", plotHeight)
+                    .attr("stroke", "#000")
+                    .attr("stroke-width", 1)
+                    .attr("stroke-dasharray", "5,5");
+            }
+        }
+        
+        // Create human figure SVGs for each meditation technique
+        function createHumanFigure(technique) {
+            const color = colorMap[technique] || "#999";
+            
+            // Different poses for different techniques
+            let pose = "";
+            switch (technique) {
+                case "Chi":
+                    // Standing pose with arms slightly out
+                    pose = `
+                        <circle cx="75" cy="30" r="20" class="human-head" />
+                        <path d="M75,50 L75,120" class="human-body" stroke="${color}" stroke-width="2" />
+                        <path d="M75,70 L45,100" class="human-limb" stroke="${color}" stroke-width="2" />
+                        <path d="M75,70 L105,100" class="human-limb" stroke="${color}" stroke-width="2" />
+                        <path d="M75,120 L55,170" class="human-limb" stroke="${color}" stroke-width="2" />
+                        <path d="M75,120 L95,170" class="human-limb" stroke="${color}" stroke-width="2" />
+                        <path d="M75,70 C65,60 85,60 75,80 Z" class="heart" fill="#ef4444" id="heart-${technique}" />
+                    `;
+                    break;
+                case "Kundalini":
+                    // Sitting pose with legs crossed
+                    pose = `
+                        <circle cx="75" cy="30" r="20" class="human-head" />
+                        <path d="M75,50 L75,110" class="human-body" stroke="${color}" stroke-width="2" />
+                        <path d="M75,70 L45,90" class="human-limb" stroke="${color}" stroke-width="2" />
+                        <path d="M75,70 L105,90" class="human-limb" stroke="${color}" stroke-width="2" />
+                        <path d="M55,110 C65,130 85,130 95,110" class="human-limb" stroke="${color}" stroke-width="2" fill="#f1f5f9" />
+                        <path d="M75,70 C65,60 85,60 75,80 Z" class="heart" fill="#ef4444" id="heart-${technique}" />
+                    `;
+                    break;
+                case "Spontaneous":
+                    // Dynamic pose with motion
+                    pose = `
+                        <circle cx="75" cy="30" r="20" class="human-head" />
+                        <path d="M75,50 L75,120" class="human-body" stroke="${color}" stroke-width="2" />
+                        <path d="M75,70 L35,85" class="human-limb" stroke="${color}" stroke-width="2" />
+                        <path d="M75,70 L115,85" class="human-limb" stroke="${color}" stroke-width="2" />
+                        <path d="M75,120 L45,160" class="human-limb" stroke="${color}" stroke-width="2" />
+                        <path d="M75,120 L105,160" class="human-limb" stroke="${color}" stroke-width="2" />
+                        <path d="M75,70 C65,60 85,60 75,80 Z" class="heart" fill="#ef4444" id="heart-${technique}" />
+                    `;
+                    break;
+                case "Metronomic":
+                    // Rhythmic pose with balanced posture
+                    pose = `
+                        <circle cx="75" cy="30" r="20" class="human-head" />
+                        <path d="M75,50 L75,120" class="human-body" stroke="${color}" stroke-width="2" />
+                        <path d="M75,70 L45,70" class="human-limb" stroke="${color}" stroke-width="2" />
+                        <path d="M75,70 L105,70" class="human-limb" stroke="${color}" stroke-width="2" />
+                        <path d="M75,120 L60,170" class="human-limb" stroke="${color}" stroke-width="2" />
+                        <path d="M75,120 L90,170" class="human-limb" stroke="${color}" stroke-width="2" />
+                        <path d="M75,70 C65,60 85,60 75,80 Z" class="heart" fill="#ef4444" id="heart-${technique}" />
+                    `;
+                    break;
+                case "Athlete":
+                    // Athletic pose with active stance
+                    pose = `
+                        <circle cx="75" cy="30" r="20" class="human-head" />
+                        <path d="M75,50 L75,120" class="human-body" stroke="${color}" stroke-width="2" />
+                        <path d="M75,70 L40,60" class="human-limb" stroke="${color}" stroke-width="2" />
+                        <path d="M75,70 L110,60" class="human-limb" stroke="${color}" stroke-width="2" />
+                        <path d="M75,120 L45,150" class="human-limb" stroke="${color}" stroke-width="2" />
+                        <path d="M75,120 L105,150" class="human-limb" stroke="${color}" stroke-width="2" />
+                        <path d="M75,70 C65,60 85,60 75,80 Z" class="heart" fill="#ef4444" id="heart-${technique}" />
+                    `;
+                    break;
+                default:
+                    // Default human figure
+                    pose = `
+                        <circle cx="75" cy="30" r="20" class="human-head" />
+                        <path d="M75,50 L75,120" class="human-body" stroke="${color}" stroke-width="2" />
+                        <path d="M75,70 L45,90" class="human-limb" stroke="${color}" stroke-width="2" />
+                        <path d="M75,70 L105,90" class="human-limb" stroke="${color}" stroke-width="2" />
+                        <path d="M75,120 L60,170" class="human-limb" stroke="${color}" stroke-width="2" />
+                        <path d="M75,120 L90,170" class="human-limb" stroke="${color}" stroke-width="2" />
+                        <path d="M75,70 C65,60 85,60 75,80 Z" class="heart" fill="#ef4444" id="heart-${technique}" />
+                    `;
+            }
+            
+            return pose;
+        }
+        
+        // Update meditation figures based on current data and time
+        function updateMeditationFigures() {
+            const figureContainer = d3.select("#figureContainer");
+            
+            // Filter data based on selections
+            const filteredData = fullData.filter(d => 
+                (selectedTechniques.size === 0 || selectedTechniques.has(d.technique)) &&
+                (currentGender === "All" || d.gender === currentGender) &&
+                Math.round(d.time) === currentTimeIndex
+            );
+            
+            // Group by technique to get average BPM for each technique
+            const techniqueData = d3.groups(filteredData, d => d.technique)
+                .map(([technique, records]) => ({
+                    technique,
+                    bpm: d3.mean(records, d => d.bpm)
+                }));
+            
+            // Clear container
+            figureContainer.selectAll(".meditation-figure").remove();
+            
+            // Create a figure for each technique
+            techniqueData.forEach(data => {
+                const figureDiv = figureContainer.append("div")
+                    .attr("class", "meditation-figure")
+                    .style("border-top", `3px solid ${colorMap[data.technique] || "#999"}`);
+                
+                figureDiv.append("div")
+                    .attr("class", "figure-title")
+                    .text(data.technique);
+                
+                const svg = figureDiv.append("svg")
+                    .attr("class", "figure-svg")
+                    .attr("viewBox", "0 0 150 180");
+                
+                svg.html(createHumanFigure(data.technique));
+                
+                figureDiv.append("div")
+                    .attr("class", "figure-info")
+                    .html(`
+                        <strong>BPM:</strong> ${data.bpm ? data.bpm.toFixed(1) : "N/A"}<br>
+                        <strong>Time:</strong> ${currentTimeIndex} sec
+                    `);
+                
+                // Start heart animation
+                if (data.bpm) {
+                    animateHeart(`#heart-${data.technique}`, data.bpm);
+                }
+            });
+        }
+        
+        // Animate heart based on BPM
+        function animateHeart(selector, bpm) {
+            const heartElement = document.querySelector(selector);
+            if (!heartElement) return;
+            
+            // Clear any existing animation
+            heartElement.style.animation = "none";
+            
+            // Calculate beat duration based on BPM
+            // 60 BPM = 1 beat per second = 1000ms
+            const beatDuration = (60 / bpm) * 1000;
+            
+            // Set the animation duration proportional to heart rate
+            setTimeout(() => {
+                heartElement.style.animation = `heartbeat ${beatDuration}ms infinite`;
+            }, 10);
+        }
+        
+        // Initialize technique selection
+        function populateTechniqueDropdown() {
+            const container = d3.select("#techniqueSelect");
+            const techniques = [...new Set(fullData.map(d => d.technique))];
+            container.selectAll("label").remove();
+            
+            techniques.forEach(tech => {
+                const label = container.append("div").attr("class", "technique-item");
+                
+                // Color indicator
+                label.append("div")
+                    .attr("class", "technique-color")
+                    .style("background-color", colorMap[tech] || "#999");
+                
+                // Checkbox
+                const inputWrapper = label.append("label").attr("class", "flex items-center gap-1");
+                inputWrapper.append("input")
+                    .attr("type", "checkbox")
+                    .attr("value", tech)
+                    .property("checked", true)
+                    .on("change", function() {
+                        if (this.checked) selectedTechniques.add(tech);
+                        else selectedTechniques.delete(tech);
+                        updateChart();
+                        updateMeditationFigures();
+                    });
+                
+                inputWrapper.append("span").text(tech);
+                selectedTechniques.add(tech);
+            });
+        }
+        
+        // Time slider functionality
+        function initTimeSlider() {
+            const slider = document.getElementById("timeSlider");
+            const timeDisplay = document.getElementById("currentTimeDisplay");
+            const playButton = document.getElementById("playButton");
+            const resetButton = document.getElementById("resetButton");
+            
+            // Set maximum time from data
+            slider.max = maxTime;
+            
+            // Update display when slider changes
+            slider.addEventListener("input", function() {
+                currentTimeIndex = parseInt(this.value);
+                timeDisplay.textContent = `Time: ${currentTimeIndex}s`;
+                updateMeditationFigures();
+                updateChart(); // To update time indicator line
+            });
+            
+            // Play button
+            playButton.addEventListener("click", function() {
+                if (animation) {
+                    // Pause animation
+                    clearInterval(animation);
+                    animation = null;
+                    this.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Play
+                    `;
+                } else {
+                    // Start animation
+                    this.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Pause
+                    `;
+                    animation = setInterval(() => {
+                        if (currentTimeIndex >= maxTime) {
+                            clearInterval(animation);
+                            animation = null;
+                            playButton.innerHTML = `
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                Play
+                            `;
+                            return;
+                        }
+                        currentTimeIndex++;
+                        slider.value = currentTimeIndex;
+                        timeDisplay.textContent = `Time: ${currentTimeIndex}s`;
+                        updateMeditationFigures();
+                        updateChart(); // To update time indicator line
+                    }, 500); // Update every 500ms
+                }
+            });
+            
+            // Reset button
+            resetButton.addEventListener("click", function() {
+                if (animation) {
+                    clearInterval(animation);
+                    animation = null;
+                    playButton.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Play
+                    `;
+                }
+                currentTimeIndex = 0;
+                slider.value = currentTimeIndex;
+                timeDisplay.textContent = `Time: ${currentTimeIndex}s`;
+                updateMeditationFigures();
+                updateChart();
+            });
+        }
+        
+        // Navigation and scroll handling
+        function initNavigation() {
+            // Smooth scroll for navigation links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+            
+            // Update active navigation link on scroll
+            window.addEventListener('scroll', function() {
+                const scrollPosition = window.scrollY;
+                
+                document.querySelectorAll('section[id]').forEach(section => {
+                    const sectionTop = section.offsetTop - 100;
+                    const sectionHeight = section.offsetHeight;
+                    const sectionId = section.getAttribute('id');
+                    
+                    if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
+                        document.querySelectorAll('.nav-link').forEach(link => {
+                            link.classList.remove('active');
+                            if (link.getAttribute('href') === `#${sectionId}`) {
+                                link.classList.add('active');
+                            }
+                        });
+                        
+                        document.querySelectorAll('.progress-dot').forEach(dot => {
+                            dot.classList.remove('active');
+                            if (dot.getAttribute('href') === `#${sectionId}`) {
+                                dot.classList.add('active');
+                            }
+                        });
+                    }
+                });
+            });
+        }
+        
+        // Load and process data
+        async function loadData() {
+            try {
+                fullData = await d3.csv("meditation_data.csv");
+                
+                // Convert numeric values
+                fullData.forEach(d => {
+                    d.time = +d.time;
+                    d.bpm = +d.bpm;
+                    d.age = +d.age;
+                });
+                
+                // Find max time value for slider
+                maxTime = d3.max(fullData, d => d.time);
+                
+                // Initialize UI components
+                populateTechniqueDropdown();
+                initTimeSlider();
+                initNavigation();
+                renderLegend();
+                updateChart();
+                updateMeditationFigures();
+                
+                // Setup click handler to deselect line
+                svg.on("click", function(event) {
+                    if (event.target === this) {
+                        selectedLineId = null;
+                        updateChart();
+                        updateMeditationFigures();
+                    }
+                });
+                
+                // Setup event handlers for filters
+                d3.select("#genderSelect").on("change", function() {
+                    currentGender = this.value;
+                    updateChart();
+                    updateMeditationFigures();
+                });
+                
+                d3.selectAll('input[name="viewMode"]').on("change", function() {
+                    currentViewMode = this.value;
+                    updateChart();
+                });
+                
+            } catch (error) {
+                console.error("Error loading or processing data:", error);
+                document.getElementById("figureContainer").innerHTML = 
+                    `<div class="p-4 bg-red-100 text-red-800 rounded-lg">
+                        Error loading data. Please check the console for details.
+                    </div>`;
+            }
+        }
+        
+        // Initialize everything when the page loads
+        window.addEventListener('DOMContentLoaded', loadData);
+    </script>
+</body>
+</html>

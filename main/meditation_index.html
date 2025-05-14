@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meditation Heart Rate Visualization</title>
+  
+  <!-- Tailwind CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  
+  <!-- Font Awesome for icons -->
+  <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.css" rel="stylesheet">
+  
+  <!-- D3.js for visualization -->
+  <script src="https://cdn.jsdelivr.net/npm/d3@7.8.5/dist/d3.min.js"></script>
+  
+  <!-- Custom styles will be in separate CSS file -->
+  <style id="customStyles"></style>
+</head>
+<body class="bg-gray-50 text-gray-800 min-h-screen">
+  <!-- Navigation -->
+  <nav id="mainNav" class="fixed top-0 w-full bg-white shadow-md z-50 transition-all duration-300">
+    <div class="container mx-auto px-4 py-3">
+      <div class="flex justify-between items-center">
+        <div class="text-xl font-bold text-purple-700">
+          <i class="fas fa-heartbeat mr-2"></i>Meditation Heart Rate
+        </div>
+        <ul class="hidden md:flex space-x-6">
+          <li><a href="#intro" class="nav-link hover:text-purple-600 transition-colors">Introduction</a></li>
+          <li><a href="#line-chart" class="nav-link hover:text-purple-600 transition-colors">Line Chart</a></li>
+          <li><a href="#human-figures" class="nav-link hover:text-purple-600 transition-colors">Meditation Figures</a></li>
+          <li><a href="#writeup" class="nav-link hover:text-purple-600 transition-colors">Writeup</a></li>
+        </ul>
+        <button id="menuToggle" class="md:hidden text-gray-600 hover:text-purple-600 focus:outline-none">
+          <i class="fas fa-bars text-2xl"></i>
+        </button>
+      </div>
+    </div>
+    <!-- Mobile menu -->
+    <div id="mobileMenu" class="md:hidden hidden bg-white border-t">
+      <div class="container mx-auto px-4 py-2">
+        <ul class="space-y-2">
+          <li><a href="#intro" class="block py-2 hover:text-purple-600 transition-colors">Introduction</a></li>
+          <li><a href="#line-chart" class="block py-2 hover:text-purple-600 transition-colors">Line Chart</a></li>
+          <li><a href="#human-figures" class="block py-2 hover:text-purple-600 transition-colors">Meditation Figures</a></li>
+          <li><a href="#writeup" class="block py-2 hover:text-purple-600 transition-colors">Writeup</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Scroll progress indicator -->
+  <div id="scrollProgress" class="fixed right-4 top-1/2 transform -translate-y-1/2 z-50 hidden md:block">
+    <div class="flex flex-col space-y-4">
+      <a href="#intro" class="scroll-dot w-3 h-3 rounded-full bg-gray-300 hover:bg-purple-500 transition-colors" data-section="intro"></a>
+      <a href="#line-chart" class="scroll-dot w-3 h-3 rounded-full bg-gray-300 hover:bg-purple-500 transition-colors" data-section="line-chart"></a>
+      <a href="#human-figures" class="scroll-dot w-3 h-3 rounded-full bg-gray-300 hover:bg-purple-500 transition-colors" data-section="human-figures"></a>
+      <a href="#writeup" class="scroll-dot w-3 h-3 rounded-full bg-gray-300 hover:bg-purple-500 transition-colors" data-section="writeup"></a>
+    </div>
+  </div>
+
+  <!-- Introduction Section -->
+  <section id="intro" class="min-h-screen pt-24 pb-16 px-4 flex flex-col justify-center bg-gradient-to-br from-purple-50 to-blue-50">
+    <div class="container mx-auto max-w-5xl">
+      <div class="bg-white rounded-2xl shadow-lg p-8 md:p-10 transform transition-all duration-500">
+        <h1 class="text-4xl md:text-5xl font-bold mb-6 text-center bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-pink-500 to-red-500">
+          Exploring Meditation Heart Rate Patterns
+        </h1>
+        <div class="w-24 h-1 bg-gradient-to-r from-purple-500 to-pink-500 mx-auto mb-8 rounded-full"></div>
+        
+        <div class="prose max-w-none">
+          <p class="text-xl mb-4 text-center">
+            Discover how different meditation techniques influence your heart rate and physical state.
+          </p>
+          
+          <div class="bg-purple-50 p-6 rounded-xl mb-8">
+            <h2 class="text-2xl font-semibold mb-4 text-purple-800">About This Visualization</h2>
+            <p class="mb-4">
+              This interactive tool helps you visualize how heart rate varies during different meditation practices. 
+              By analyzing this data, you can gain valuable insights into how various techniques affect your body's physical response.
+            </p>
+            <p>
+              The visualization includes:
+            </p>
+            <ul class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+              <li class="flex items-start">
+                <div class="bg-purple-100 p-2 rounded-full mr-3">
+                  <i class="fas fa-chart-line text-purple-600"></i>
+                </div>
+                <div>
+                  <span class="font-medium">Line Chart:</span> Track BPM changes over time
+                </div>
+              </li>
+              <li class="flex items-start">
+                <div class="bg-purple-100 p-2 rounded-full mr-3">
+                  <i class="fas fa-user-alt text-purple-600"></i>
+                </div>
+                <div>
+                  <span class="font-medium">Human Figures:</span> See heart rate animations for each technique
+                </div>
+              </li>
+              <li class="flex items-start">
+                <div class="bg-purple-100 p-2 rounded-full mr-3">
+                  <i class="fas fa-sliders-h text-purple-600"></i>
+                </div>
+                <div>
+                  <span class="font-medium">Time Control:</span> Animate through meditation sessions
+                </div>
+              </li>
+              <li class="flex items-start">
+                <div class="bg-purple-100 p-2 rounded-full mr-3">
+                  <i class="fas fa-filter text-purple-600"></i>
+                </div>
+                <div>
+                  <span class="font-medium">Filters:</span> Compare across techniques and genders
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="text-center mt-6">
+          <a href="#line-chart" class="inline-flex items-center justify-center px-8 py-3 bg-purple-600 text-white font-medium rounded-full hover:bg-purple-700 transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2">
+            Explore the Data
+            <svg class="w-5 h-5 ml-2 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Line Chart Section -->
+  <section id="line-chart" class="min-h-screen py-20 px-4 bg-white">
+    <div class="container mx-auto max-w-6xl">
+      <h2 class="text-3xl font-bold mb-2 text-center">Heart Rate Trends During Meditation</h2>
+      <p class="text-center text-gray-600 mb-8">Explore how heart rate changes over time for different techniques</p>
+      
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+        <!-- Sidebar Controls -->
+        <div class="space-y-6">
+          <!-- Techniques -->
+          <div class="bg-white p-6 rounded-xl shadow-md">
+            <h3 class="text-lg font-semibold mb-3">Techniques</h3>
+            <div id="techniqueSelect" class="bg-gray-50 p-3 rounded-lg max-h-48 overflow-y-auto border border-gray-200 text-sm space-y-2"></div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <!-- Gender Filter -->
+            <div class="bg-white p-6 rounded-xl shadow-md">
+              <h3 class="text-lg font-semibold mb-3">Gender</h3>
+              <select id="genderSelect" class="w-full p-2 border border-gray-300 rounded bg-white text-sm">
+                <option value="All">All</option>
+                <option value="M">Male</option>
+                <option value="F">Female</option>
+              </select>
+            </div>
+
+            <!-- Display Mode -->
+            <div class="bg-white p-6 rounded-xl shadow-md">
+              <h3 class="text-lg font-semibold mb-3">Display</h3>
+              <div class="space-y-2 text-sm">
+                <label class="inline-flex items-center">
+                  <input type="radio" name="viewMode" value="all" checked class="form-radio text-purple-600" />
+                  <span class="ml-2">All Data</span>
+                </label><br/>
+                <label class="inline-flex items-center">
+                  <input type="radio" name="viewMode" value="average" class="form-radio text-purple-600" />
+                  <span class="ml-2">Average</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Insights Panel -->
+          <div class="bg-white p-6 rounded-xl shadow-md">
+            <h3 class="text-lg font-semibold mb-3">Insights</h3>
+            <ul id="insightList" class="list-disc list-inside text-sm text-gray-700 space-y-2"></ul>
+          </div>
+        </div>
+
+        <!-- Line Chart -->
+        <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-md">
+          <div id="legend" class="flex flex-wrap gap-3 justify-center text-sm mb-4"></div>
+          <div class="relative">
+            <svg id="lineChart" width="100%" height="400" class="w-full"></svg>
+            <div id="lineChartTooltip" class="absolute hidden bg-white p-2 rounded shadow-lg text-sm border border-gray-200"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Human Figures Section -->
+  <section id="human-figures" class="min-h-screen py-20 px-4 bg-gradient-to-br from-indigo-50 to-purple-50">
+    <div class="container mx-auto max-w-6xl">
+      <h2 class="text-3xl font-bold mb-2 text-center">Meditation Figures & Heart Rates</h2>
+      <p class="text-center text-gray-600 mb-8">Visualize heart rate patterns with animated human figures</p>
+      
+      <!-- Time Control -->
+      <div class="bg-white p-6 rounded-xl shadow-md mb-8 max-w-3xl mx-auto">
+        <h3 class="text-lg font-semibold mb-4">Time Control</h3>
+        
+        <div class="flex items-center space-x-4 mb-4">
+          <button id="playButton" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg flex items-center">
+            <i class="fas fa-play mr-2"></i>Play
+          </button>
+          <button id="resetButton" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg flex items-center">
+            <i class="fas fa-sync-alt mr-2"></i>Reset
+          </button>
+          <div class="text-lg font-mono bg-gray-100 px-3 py-1 rounded-lg">
+            Time: <span id="timeDisplay">0</span>s
+          </div>
+        </div>
+        
+        <div class="flex items-center space-x-4">
+          <input type="range" id="timeSlider" min="0" max="100" value="0" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+          <div class="flex items-center space-x-2">
+            <span class="text-sm">Speed:</span>
+            <select id="speedControl" class="border border-gray-300 rounded p-1 text-sm">
+              <option value="0.5">0.5x</option>
+              <option value="1" selected>1x</option>
+              <option value="2">2x</option>
+              <option value="4">4x</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Human Figures Container -->
+      <div id="figuresContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+        <!-- Figures will be generated here by JavaScript -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Final Writeup Section -->
+  <section id="writeup" class="min-h-screen py-20 px-4 bg-white">
+    <div class="container mx-auto max-w-4xl">
+      <h2 class="text-3xl font-bold mb-6 text-center">Final Writeup: Heart Rate Trends During Meditation</h2>
+      
+      <div class="prose max-w-none bg-white p-8 rounded-xl shadow-md">
+        <h3 class="text-2xl font-semibold mb-4">Motivation</h3>
+        <p>
+          The goal of this visualization was to explore how heart rate patterns vary across different meditation
+          techniques, and whether factors like gender identity and session type influence these trends.
+          Meditation is often associated with physical and emotional regulation, and we wanted to provide a visual
+          exploration of these effects that is both data-driven and personally engaging.
+        </p>
+
+        <h3 class="text-2xl font-semibold mt-8 mb-4">Visualization Design</h3>
+        <p>
+          Our visualization combines two complementary approaches:
+        </p>
+        <ul>
+          <li>
+            <strong>Line Chart:</strong> Shows detailed heart rate fluctuations over time, enabling temporal
+            analysis while revealing person-specific variation.
+          </li>
+          <li>
+            <strong>Human Figures with Beating Hearts:</strong> Provides an intuitive and engaging representation
+            of heart rates through animated figures, where the beating animation corresponds to actual BPM values.
+          </li>
+        </ul>
+
+        <h3 class="text-2xl font-semibold mt-8 mb-4">Interactive Elements</h3>
+        <p>
+          The interface includes:
+        </p>
+        <ul>
+          <li>Technique & gender filters that update both visualizations in real time</li>
+          <li>Time slider to animate through the meditation session</li>
+          <li>Play/pause/reset controls for the animation</li>
+          <li>Speed control for animation playback</li>
+          <li>Interactive tooltips that provide detailed information on hover</li>
+        </ul>
+
+        <h3 class="text-2xl font-semibold mt-8 mb-4">Development Process</h3>
+        <p>
+          We developed this visualization using D3.js for data manipulation and SVG creation, with several key steps:
+        </p>
+        <ol>
+          <li>Data preprocessing to identify meditation techniques and structure</li>
+          <li>Line chart implementation for temporal analysis</li>
+          <li>Human figure SVG design for each meditation technique</li>
+          <li>Heart beat animation implementation with variable rates</li>
+          <li>Time slider and control integration</li>
+          <li>Responsive design and cross-browser testing</li>
+        </ol>
+
+        <h3 class="text-2xl font-semibold mt-8 mb-4">Insights & Findings</h3>
+        <p>
+          Through this visualization, users can discover:
+        </p>
+        <ul>
+          <li>How different meditation techniques affect heart rate patterns</li>
+          <li>Gender differences in physiological responses to meditation</li>
+          <li>The progression of heart rate changes throughout a meditation session</li>
+          <li>Techniques that produce the most significant heart rate reductions</li>
+        </ul>
+
+        <div class="text-center mt-8 pt-6 border-t border-gray-200">
+          <p class="text-sm text-gray-500">
+            Created by: Meditation Research Team<br>
+            Data collected from meditation sessions with diverse participants
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-gray-800 text-white py-8">
+    <div class="container mx-auto px-4 text-center">
+      <p>© 2023 Meditation Heart Rate Visualization</p>
+      <div class="mt-4 flex justify-center space-x-4">
+        <a href="#intro" class="hover:text-purple-300 transition-colors"><i class="fas fa-arrow-up mr-1"></i>Back to Top</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Custom scripts will be in a separate JS file -->
+  <script id="customScript"></script>
+</body>
+</html>

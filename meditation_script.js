@@ -807,7 +807,7 @@ const loadData = () => {
   };
   
   // Use D3 to load CSV data
-  d3.csv("https://page1.genspark.site/get_upload_url/5d18a9b52d68ac3ef234c6b259c7402f4f3fe18a57cdb33899dbf0b625b1deab/default/202608ba-ced0-47dd-95d2-be224b8d65b4")
+  d3.csv("meditation_data.csv")
     .then(data => {
       // Convert string values to appropriate types
       data.forEach(d => {

@@ -1,0 +1,45 @@
+body {
+  font-family: 'Inter', sans-serif;
+}
+
+/* Axis styles */
+.axis path,
+.axis line {
+  stroke: #cbd5e1;
+}
+
+.axis text {
+  fill: #475569;
+  font-size: 0.75rem;
+}
+
+/* Tooltip styling */
+.tooltip {
+  position: absolute;
+  background-color: rgba(255, 255, 255, 0.95);
+  color: #1e293b;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.75rem;
+  border-radius: 0.375rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  pointer-events: none;
+  display: none;
+  z-index: 50;
+  border: 1px solid #e2e8f0;
+}
+
+/* Line styling */
+.person-line {
+  transition: all 0.3s ease;
+}
+
+.person-line:hover {
+  stroke-width: 3;
+  opacity: 1;
+}
+
+/* Optional adjustment for select/radio heights */
+select,
+input[type="radio"] {
+  line-height: 1.25rem;
+}

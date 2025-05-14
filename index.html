@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Meditation Trends</title>
+
+  <!-- Tailwind CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+</head>
+<body class="bg-gray-50 text-gray-900">
+  <div class="max-w-screen-xl mx-auto py-6 px-4">
+    <h1 class="text-2xl font-bold text-center mb-2">Heart Rate Trends During Meditation</h1>
+    <p class="text-sm text-center text-gray-600 mb-4">
+      Explore how gender and meditation techniques influence heart rate trends.
+    </p>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 items-start">
+      <!-- Sidebar -->
+      <div class="space-y-4">
+        <!-- Techniques -->
+        <div class="bg-white p-4 rounded-lg shadow">
+          <h2 class="text-sm font-semibold mb-2">Techniques</h2>
+          <div id="techniqueSelect" class="bg-gray-100 p-2 rounded-lg max-h-40 overflow-y-auto border border-gray-300 text-sm space-y-1"></div>
+        </div>
+
+        <!-- Gender + View Toggle (side-by-side) -->
+        <div class="flex gap-2">
+          <!-- Gender -->
+          <div class="bg-white p-3 rounded-lg shadow w-1/2">
+            <label for="genderSelect" class="block text-sm font-semibold mb-1">Gender</label>
+            <select id="genderSelect" class="w-full p-1.5 border border-gray-300 rounded bg-white text-sm">
+              <option value="All">All</option>
+              <option value="M">Male</option>
+              <option value="F">Female</option>
+            </select>
+          </div>
+
+          <!-- Display Mode -->
+          <div class="bg-white p-3 rounded-lg shadow w-1/2">
+            <h2 class="text-sm font-semibold mb-1">Display</h2>
+            <div class="space-y-1 text-sm">
+              <label class="inline-flex items-center gap-1">
+                <input type="radio" name="viewMode" value="all" checked class="form-radio text-blue-600" />
+                All Participants
+              </label><br/>
+              <label class="inline-flex items-center gap-1">
+                <input type="radio" name="viewMode" value="average" class="form-radio text-blue-600" />
+                Average
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Insights -->
+        <div class="bg-white p-4 rounded-lg shadow">
+          <h2 class="text-sm font-semibold mb-2">Insights</h2>
+          <ul id="insightList" class="list-disc list-inside text-sm text-gray-700 space-y-1"></ul>
+        </div>
+      </div>
+
+      <!-- Chart Section -->
+      <div class="lg:col-span-2 bg-white p-4 rounded-lg shadow">
+        <div id="legend" class="flex flex-wrap gap-3 justify-center text-xs mb-4"></div>
+        <svg id="chart" width="100%" height="420" class="w-full"></svg>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

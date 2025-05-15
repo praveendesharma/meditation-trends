@@ -472,16 +472,36 @@ function populateTechniqueDropdown() {
 function enableHeartMode() {
   if (heartActive) return;
   heartActive = true;
+
   const container = document.getElementById("techniqueSelect");
-  cardElem = container.parentElement; // the card wrapper div
-  cardOriginalHTML = cardElem.innerHTML; // backup full card content
+  cardElem = container.parentElement; // the outer card div
+  cardOriginalHTML = cardElem.innerHTML; // backup content
+
+  // Get computed dimensions of the card
+  const cardStyles = getComputedStyle(cardElem);
+  const width = cardElem.offsetWidth;
+  const height = cardElem.offsetHeight;
+  const padding = {
+    top: parseFloat(cardStyles.paddingTop),
+    bottom: parseFloat(cardStyles.paddingBottom),
+    left: parseFloat(cardStyles.paddingLeft),
+    right: parseFloat(cardStyles.paddingRight)
+  };
+
+  // Clear and style the card
   cardElem.innerHTML = "";
   cardElem.classList.add("flex", "justify-center", "items-center");
+  cardElem.style.minWidth = width + "px";
+  cardElem.style.minHeight = height + "px";
+  cardElem.style.padding = `${padding.top}px ${padding.right}px ${padding.bottom}px ${padding.left}px`;
+
+  // Add heart icon
   heartDiv = document.createElement("div");
   heartDiv.className = "heart-icon";
+  heartDiv.style.setProperty('--beat-speed', `${60 / 60}s`);
   cardElem.appendChild(heartDiv);
-  heartDiv.style.setProperty('--beat-speed', `${60/60}s`);
 }
+
 
 function disableHeartMode() {
   if (!heartActive) return;

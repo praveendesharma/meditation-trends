@@ -90,8 +90,8 @@
         </div>
         <div class="bg-white bg-opacity-60 backdrop-filter backdrop-blur-sm rounded-lg p-6 hover:bg-opacity-80 transition shadow-md border border-amber-100">
           <div class="text-4xl mb-3 text-amber-600"><i class="fas fa-brain"></i></div>
-          <h3 class="text-xl font-semibold mb-2 text-teal-800">5 Techniques</h3>
-          <p class="text-teal-700">Compare data from Chi, Kundalini, Spontaneous, Metronomic & Athletic meditation</p>
+          <h3 class="text-xl font-semibold mb-2 text-teal-800">Meditation Techniques</h3>
+          <p class="text-teal-700">See how BPM varies in meditation techniques compared with normal and athletic baseline readings.</p>
         </div>
         <div class="bg-white bg-opacity-60 backdrop-filter backdrop-blur-sm rounded-lg p-6 hover:bg-opacity-80 transition shadow-md border border-amber-100">
           <div class="text-4xl mb-3 text-amber-600"><i class="fas fa-chart-line"></i></div>
@@ -102,10 +102,62 @@
     </div>
   </section>
 
+  <!-- Introduction to Meditation Techniques -->
+  <section class="py-16 bg-white">
+    <div class="max-w-5xl mx-auto px-6">
+      <h2 class="text-3xl font-bold text-center mb-8 text-teal-900">Understanding Meditation Techniques</h2>
+      
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="bg-sage-50 p-6 rounded-lg shadow-md border border-amber-100">
+          <h3 class="text-xl font-bold mb-3 text-teal-800">Meditation Techniques</h3>
+          <ul class="space-y-4 text-teal-700">
+            <li>
+              <h4 class="font-semibold">Chi Meditation</h4>
+              <p>Focuses on energy cultivation through breath control and visualization, directing chi (life energy) through meridian pathways in the body.</p>
+            </li>
+            <li>
+              <h4 class="font-semibold">Kundalini Yoga</h4>
+              <p>Combines dynamic breathing techniques, movement, and mantras to awaken dormant energy at the base of the spine and raise consciousness.</p>
+            </li>
+            <li>
+              <h4 class="font-semibold">Metronomic Breathing</h4>
+              <p>Utilizes precisely timed breath patterns (typically 4-6 breaths per minute) to synchronize heart rate variability and activate the parasympathetic nervous system.</p>
+            </li>
+          </ul>
+        </div>
+        
+        <div class="bg-sage-50 p-6 rounded-lg shadow-md border border-amber-100">
+          <h3 class="text-xl font-bold mb-3 text-teal-800">Baseline Readings</h3>
+          <ul class="space-y-4 text-teal-700">
+            <li>
+              <h4 class="font-semibold">Normal</h4>
+              <p>Baseline readings from individuals with no specialized meditation training, used as a control group to compare how trained practitioners differ in their physiological responses.</p>
+              <p class="mt-1">These control measurements establish a reference point for typical heart rate patterns in the general population, allowing researchers to isolate the specific effects of meditation practices.</p>
+            </li>
+            <li>
+              <h4 class="font-semibold">Athlete</h4>
+              <p>Baseline heart rate measurements from Ironman triathletes, who typically exhibit lower resting heart rates and different cardiovascular responses due to their extensive endurance training.</p>
+            </li>
+          </ul>
+        </div>
+        
+        <div class="bg-sage-50 p-6 rounded-lg shadow-md border border-amber-100">
+          <h3 class="text-xl font-bold mb-3 text-teal-800">Research Process</h3>
+          <p class="text-teal-700 mb-3">For this visualization, we analyzed a 200-second sample from an established heart rate dataset. This standardized time window was selected to provide a focused view of each meditation technique's impact on cardiovascular patterns.</p>
+          
+          <p class="text-teal-700 mb-3">The 200-second interval represents a critical phase during meditation practice when practitioners typically achieve a consistent meditative state, making it ideal for comparative analysis.</p>
+          
+          <p class="text-teal-700 mb-3">Our visualization allows for direct comparison between different meditation techniques and baseline readings, revealing distinctive heart rate signatures and variability patterns unique to each approach.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- Visualization Section -->
   <section id="visualization" class="py-20 bg-sage-50">
     <div class="max-w-screen-xl mx-auto py-6 px-4">
-      <h2 class="text-3xl font-bold text-center mb-12 text-teal-900">Meditation & Heart Rate Visualization</h2>
+      <h2 class="text-3xl font-bold text-center mb-3 text-teal-900">Meditation & Heart Rate Visualization</h2>
+      <p class="text-center text-teal-700 max-w-2xl mx-auto mb-12">Explore how different meditation techniques influence heart rate patterns over time. Interact with the chart to compare techniques, filter by gender, and observe individual or averaged responses.</p>
       
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
         <div class="space-y-4">
@@ -140,13 +192,33 @@
           </div>
           
           <div class="bg-white p-5 rounded-lg shadow-md border border-amber-100">
-            <h3 class="text-lg font-semibold mb-3 text-teal-800">Key Insights</h3>
+            <h3 class="text-lg font-semibold mb-3 text-teal-800">Insights: Current View</h3>
             <ul id="insightList" class="list-disc list-inside text-sm text-teal-700 space-y-2"></ul>
           </div>
         </div>
         
         <div class="lg:col-span-2 bg-white p-6 rounded-lg shadow-md border border-amber-100">
-          <div id="legend" class="flex flex-wrap gap-4 justify-center text-sm mb-6 p-3 border-b border-sage-100"></div>
+          <div class="flex justify-between items-center mb-6 pb-3 border-b border-sage-100">
+            <div id="legend" class="flex flex-wrap gap-4 justify-center text-sm"></div>
+            <div class="relative">
+              <button id="helpButton" class="w-8 h-8 flex items-center justify-center rounded-full bg-amber-100 text-teal-800 hover:bg-amber-200 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-colors">
+                <i class="fas fa-question-circle"></i>
+              </button>
+              <div id="featureHelp" class="absolute right-0 top-full mt-2 hidden bg-white p-4 rounded-lg shadow-xl border border-amber-100 w-80 z-10">
+                <h4 class="font-bold text-teal-800 mb-2 border-b border-sage-100 pb-2">Interactive Features</h4>
+                <ul class="space-y-3 text-sm text-teal-700">
+                  <li><i class="fas fa-mouse-pointer text-amber-500 mr-1"></i> <strong>Hover over lines</strong> to see details and highlight specific techniques</li>
+                  <li><i class="fas fa-heartbeat text-amber-500 mr-1"></i> <strong>Watch the beating heart</strong> that syncs with BPM when hovering over chart</li>
+                  <li><i class="fas fa-search-plus text-amber-500 mr-1"></i> <strong>Zoom horizontally</strong> by scrolling on the chart (reset with button below legend)</li>
+                  <li><i class="fas fa-mouse-pointer text-amber-500 mr-1"></i> <strong>Click any line</strong> to lock focus on that participant</li>
+                  <li><i class="fas fa-undo text-amber-500 mr-1"></i> <strong>Click anywhere on the chart</strong> to exit focused view and return to normal view</li>
+                  <li><i class="fas fa-filter text-amber-500 mr-1"></i> <strong>Filter by technique/gender</strong> using controls on the left panel</li>
+                  <li><i class="fas fa-chart-line text-amber-500 mr-1"></i> <strong>Switch views</strong> between individual participants and technique averages</li>
+                  <li><i class="fas fa-lightbulb text-amber-500 mr-1"></i> <strong>Insights: Current View</strong> dynamically updates with statistics about your current selection (technique averages, participant details, etc.)</li>
+                </ul>
+              </div>
+            </div>
+          </div>
           <svg id="chart" width="100%" height="460" class="w-full"></svg>
         </div>
       </div>
@@ -161,37 +233,115 @@
       <div class="space-y-12">
         <div class="bg-sage-50 p-6 rounded-lg shadow-md border border-amber-100">
           <h3 class="text-xl font-bold mb-3 flex items-center"><i class="fas fa-compass mr-2 text-amber-500"></i> Motivation</h3>
-          <p class="text-teal-700">The goal of this visualization was to explore how heart rate patterns vary across different meditation techniques, and whether factors like gender identity and session type (individual vs. group) influence these trends...</p>
+          <div class="text-teal-700 space-y-3">
+            <p>Our MindfulMetrics visualization emerged from a desire to explore the physiological impacts of meditation practices on heart rate dynamics. While meditation is widely recognized for its stress reduction benefits, quantifiable data visualizations of these effects remain limited in accessibility and engagement.</p>
+            <p>We aimed to create a tool that bridges the gap between scientific understanding and everyday practice, allowing users to observe how different meditation techniques affect heart rate patterns over time. The visualization serves both practitioners seeking to understand their own practice and researchers studying the physiological markers of meditative states.</p>
+            <p>By presenting heart rate variability data in an intuitive, interactive format, we hope to demystify the science behind meditation while providing evidence of its quantifiable effects on the autonomic nervous system.</p>
+          </div>
         </div>
         
         <div class="bg-sage-50 p-6 rounded-lg shadow-md border border-amber-100">
-          <h3 class="text-xl font-bold mb-3 flex items-center"><i class="fas fa-palette mr-2 text-amber-500"></i> Visualization Design & Encodings</h3>
-          <p class="text-teal-700">We use a line chart to show heart rate fluctuations over time for each individual, a choice driven by the effectiveness of position...</p>
+          <h3 class="text-xl font-bold mb-3 flex items-center"><i class="fas fa-palette mr-2 text-amber-500"></i> Visual Encoding Decisions</h3>
+          <div class="text-teal-700 space-y-3">
+            <p>Our primary visualization uses a line chart to represent heart rate (BPM) over time, as temporal patterns are fundamental to understanding meditative effects. This choice leverages position encoding—the most effective visual channel for quantitative data—to clearly communicate the magnitude and direction of heart rate changes.</p>
+            <p>Each meditation technique is assigned a distinctive color in a carefully selected palette: vibrant blue for Chi Meditation, rich purple for Kundalini Yoga, emerald green for Normal baseline, vibrant red for Metronomic Breathing, and bright cyan for Athlete meditation. These color choices balance perceptual effectiveness with thematic relevance, using cool tones (blues, greens) for calming practices and warmer/brighter tones for energizing techniques.</p>
+            <p>Line opacity and thickness are modulated to enhance focus: selected lines increase in opacity from 0.7 to 1.0 and thickness from 1.8px to 3px, while unselected lines fade to 0.1 opacity. This creates a clear visual hierarchy that guides attention to relevant data patterns without removing contextual information.</p>
+          </div>
         </div>
         
         <div class="bg-sage-50 p-6 rounded-lg shadow-md border border-amber-100">
-          <h3 class="text-xl font-bold mb-3 flex items-center"><i class="fas fa-wrench mr-2 text-amber-500"></i> Data Transformations</h3>
-          <p class="text-teal-700">Data is filtered dynamically based on selected meditation techniques and gender, using input controls...</p>
+          <h3 class="text-xl font-bold mb-3 flex items-center"><i class="fas fa-wrench mr-2 text-amber-500"></i> Data Transformations & Algorithm Design</h3>
+          <div class="text-teal-700 space-y-3">
+            <p>Our visualization applies several key data transformations to enhance analytical depth and user experience:</p>
+            <p>1. <strong>Dynamic Filtering:</strong> The data is filtered on-demand based on technique and gender selections, allowing for targeted exploration. This filtering happens at the data object level before rendering, reducing computational overhead.</p>
+            <p>2. <strong>Aggregation:</strong> When viewing average heart rates by technique, we implement a multi-step aggregation algorithm that first groups data by technique, then by time points, and finally calculates the mean BPM across participants at each time point. This transformation reveals technique-specific patterns while smoothing individual variations.</p>
+            <p>3. <strong>Domain Optimization:</strong> Y-axis domains are dynamically calculated to show the full range of heart rate values plus a 5 BPM buffer, maximizing the useful visualization area while maintaining consistent scale interpretation.</p>
+            <p>4. <strong>Horizontal-Only Zoom:</strong> We implemented a custom zoom behavior that constrains transformations to the x-axis (time) while preserving the y-axis scale, allowing users to examine temporal patterns without distorting the heart rate magnitude perception.</p>
+          </div>
         </div>
         
         <div class="bg-sage-50 p-6 rounded-lg shadow-md border border-amber-100">
-          <h3 class="text-xl font-bold mb-3 flex items-center"><i class="fas fa-mouse-pointer mr-2 text-amber-500"></i> Interaction Design</h3>
-          <p class="text-teal-700">The interface includes technique & gender filters, toggle between individual/average view, and interactive legend...</p>
+          <h3 class="text-xl font-bold mb-3 flex items-center"><i class="fas fa-mouse-pointer mr-2 text-amber-500"></i> Interaction Design & User Experience</h3>
+          <div class="text-teal-700 space-y-3">
+            <p>Interaction was a primary focus of our design, with several carefully implemented features:</p>
+            <p>1. <strong>Immersive Landing Experience:</strong> The full-screen landing page with breathing animation creates an immediate connection to the meditation theme while establishing a moment of mindfulness before data exploration.</p>
+            <p>2. <strong>Responsive Hovering:</strong> Invisible wider stroke paths (20px) were placed over each line to enhance hover targeting accuracy without visual clutter, making the interface accessible across devices and for users with varying motor control.</p>
+            <p>3. <strong>Dynamic Tooltips:</strong> Tooltips show precise BPM values at the cursor's time position using a bisector algorithm that finds the nearest data point, enhancing data readability beyond what visual inspection alone can provide.</p>
+            <p>4. <strong>Beating Heart Visualization:</strong> The innovative heart icon dynamically adjusts its animation speed to match the BPM at the cursor position, creating a visceral, embodied understanding of the numerical data through animation timing.</p>
+            <p>5. <strong>Horizontal-Only Zoom:</strong> Users can zoom into specific time segments (constrained to 0-200 seconds) while maintaining a consistent vertical scale, allowing focused examination of temporal patterns without distorting magnitude perception.</p>
+          </div>
         </div>
         
         <div class="bg-sage-50 p-6 rounded-lg shadow-md border border-amber-100">
-          <h3 class="text-xl font-bold mb-3 flex items-center"><i class="fas fa-brain mr-2 text-amber-500"></i> Design Rationale</h3>
-          <p class="text-teal-700">The visual encodings, interaction model, and color palette were chosen for clarity and accessibility...</p>
+          <h3 class="text-xl font-bold mb-3 flex items-center"><i class="fas fa-brain mr-2 text-amber-500"></i> Design Rationale & Accessibility</h3>
+          <div class="text-teal-700 space-y-3">
+            <p>Our design choices were guided by several core principles:</p>
+            <p>1. <strong>Earth-Toned Color Palette:</strong> The teal, amber, and sage color scheme was selected to evoke natural environments associated with meditation, creating a cohesive thematic connection between content and presentation. These colors also provide sufficient contrast for accessibility while maintaining visual harmony.</p>
+            <p>2. <strong>Progressive Disclosure:</strong> Information is revealed gradually—from the landing page to the overview and finally to detailed data interactions—helping users build mental models progressively without overwhelming them with complexity.</p>
+            <p>3. <strong>Translucent Design Elements:</strong> The navigation bar and card backgrounds use controlled transparency with backdrop filters, creating visual depth while maintaining readability. This approach helps maintain focus on the data while providing necessary context.</p>
+            <p>4. <strong>Clear Visual Hierarchy:</strong> Typography size, weight, and color vary systematically to establish information importance, with section headers (text-3xl), card titles (text-xl), and body text (base) creating consistent structural guidance.</p>
+            <p>5. <strong>Multimodal Feedback:</strong> The beating heart visualization provides an alternative, visceral way to understand BPM data beyond visual graphs, making the information more accessible and memorable through multiple sensory channels.</p>
+          </div>
         </div>
         
         <div class="bg-sage-50 p-6 rounded-lg shadow-md border border-amber-100">
           <h3 class="text-xl font-bold mb-3 flex items-center"><i class="fas fa-laptop-code mr-2 text-amber-500"></i> Development Process</h3>
-          <p class="text-teal-700">We used D3.js for rendering and interaction, focusing on performance and modularity...</p>
+          <div class="text-teal-700 space-y-3">
+            <p>Our development followed an iterative, user-centered approach:</p>
+            <p>1. <strong>Initial Prototyping:</strong> We began with a basic D3.js line chart visualization of heart rate data, establishing core functionality before enhancing the design.</p>
+            <p>2. <strong>UI Redesign:</strong> After gathering initial feedback, we completely redesigned the user interface with a full-screen landing page and meditation-themed aesthetic using TailwindCSS for responsive styling.</p>
+            <p>3. <strong>Visualization Enhancement:</strong> We identified and resolved data representation issues, fixing meditation technique name inconsistencies and implementing a more vibrant, accessible color scheme for technique differentiation.</p>
+            <p>4. <strong>Interaction Refinement:</strong> Based on user testing, we enhanced tooltip functionality to show dynamic BPM values at cursor position and added clear axis labels to improve data interpretation.</p>
+            <p>5. <strong>Advanced Feature Implementation:</strong> In the final phase, we developed the horizontal-only zoom functionality and the innovative beating heart visualization that synchronizes with BPM data.</p>
+            <p>6. <strong>Performance Optimization:</strong> Throughout development, we continuously refined our code for performance, implementing efficient data filtering, update patterns, and zoom behavior to ensure smooth interactions even with larger datasets.</p>
+            <p>7. <strong>Accessibility Improvements:</strong> We audited and enhanced color contrast, interactive element sizing, and provided multiple ways to understand the data (visual, numerical, and animation-based) to improve accessibility.</p>
+          </div>
         </div>
         
         <div class="bg-sage-50 p-6 rounded-lg shadow-md border border-amber-100">
-          <h3 class="text-xl font-bold mb-3 flex items-center"><i class="fas fa-lightbulb mr-2 text-amber-500"></i> Creativity & Originality</h3>
-          <p class="text-teal-700">What sets our visualization apart is the multi-view coordination and exploratory design...</p>
+          <h3 class="text-xl font-bold mb-3 flex items-center"><i class="fas fa-lightbulb mr-2 text-amber-500"></i> Innovation & Future Directions</h3>
+          <div class="text-teal-700 space-y-3">
+            <p>Our visualization introduces several innovative elements that extend beyond conventional heart rate visualizations:</p>
+            <p>1. <strong>Embodied Data Experience:</strong> The beating heart visualization creates a visceral, embodied understanding of BPM data through animation timing, connecting abstract numbers to physical sensation.</p>
+            <p>2. <strong>Meditation-Specific Design:</strong> From the breathing animation on the landing page to the earth-toned color palette, every aspect of the design reinforces the meditation theme, creating a cohesive, immersive experience.</p>
+            <p>3. <strong>Constrained Interaction Model:</strong> By limiting zoom to the horizontal axis and implementing a range constraint (0-200 seconds), we created an interaction model specifically optimized for temporal pattern analysis in heart rate data.</p>
+            <p>Looking forward, we envision expanding this visualization to include:</p>
+            <p>- Real-time data integration with wearable heart rate monitors</p>
+            <p>- Comparison views between individual sessions and group averages</p>
+            <p>- Machine learning-based pattern recognition to identify specific meditation states</p>
+            <p>- Personalized insights based on individual heart rate response patterns</p>
+          </div>
+        </div>
+        
+        <div class="bg-sage-50 p-6 rounded-lg shadow-md border border-amber-100">
+          <h3 class="text-xl font-bold mb-3 flex items-center"><i class="fas fa-users mr-2 text-amber-500"></i> Team Contributions</h3>
+          <div class="text-teal-700 space-y-3">
+            <p>Our interdisciplinary team collaborated closely throughout this project, with each member bringing their unique expertise to different aspects of the visualization:</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+              <div class="bg-white bg-opacity-60 backdrop-filter backdrop-blur-sm rounded-lg p-4 border border-amber-100">
+                <h4 class="font-semibold text-teal-800">Ishaan Gosain</h4>
+                <p>Led the UI enhancement initiative and visualization refinement, focusing on cohesive design elements and user experience improvements that aligned with meditation themes.</p>
+              </div>
+              
+              <div class="bg-white bg-opacity-60 backdrop-filter backdrop-blur-sm rounded-lg p-4 border border-amber-100">
+                <h4 class="font-semibold text-teal-800">Vedant Vardhaan</h4>
+                <p>Managed data processing pipeline and documentation, ensuring data integrity across meditation techniques and crafting the comprehensive project writeup.</p>
+              </div>
+              
+              <div class="bg-white bg-opacity-60 backdrop-filter backdrop-blur-sm rounded-lg p-4 border border-amber-100">
+                <h4 class="font-semibold text-teal-800">Chinmay Bharambe</h4>
+                <p>Implemented the innovative beating heart visualization and created the responsive website layout, integrating the immersive landing page experience.</p>
+              </div>
+              
+              <div class="bg-white bg-opacity-60 backdrop-filter backdrop-blur-sm rounded-lg p-4 border border-amber-100">
+                <h4 class="font-semibold text-teal-800">Praveen Sharma</h4>
+                <p>Developed the core line chart visualization and interactive features, including dynamic tooltips, customized zoom functionality, and hover behaviors.</p>
+              </div>
+            </div>
+            
+            <p class="mt-4 text-center italic">Each team member contributed approximately 8-12 hours to this project, collaborating through regular design reviews and feedback sessions to ensure a cohesive final product.</p>
+          </div>
         </div>
       </div>
     </div>

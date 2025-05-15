@@ -72,6 +72,30 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   });
+
+  // Help button functionality
+  const helpButton = document.getElementById('helpButton');
+  const featureHelp = document.getElementById('featureHelp');
+  
+  if (helpButton && featureHelp) {
+    // Toggle help tooltip when help button is clicked
+    helpButton.addEventListener('click', function(e) {
+      e.stopPropagation();
+      featureHelp.classList.toggle('hidden');
+    });
+    
+    // Hide help tooltip when clicking anywhere else
+    document.addEventListener('click', function() {
+      if (!featureHelp.classList.contains('hidden')) {
+        featureHelp.classList.add('hidden');
+      }
+    });
+    
+    // Prevent clicks within the tooltip from closing it
+    featureHelp.addEventListener('click', function(e) {
+      e.stopPropagation();
+    });
+  }
 });
 
 const svg = d3.select("#chart"),
@@ -98,6 +122,9 @@ let techniqueHTMLBackup = "";
 let cardOriginalHTML = "";
 let cardElem = null;
 let heartDiv = null;
+
+// Add a flag to track if mouse is over a line
+let isHoveringLine = false;
 
 const colorMap = {
   "Chi Meditation": "#1E88E5", // Vivid blue
@@ -246,12 +273,12 @@ function renderInsights() {
     const bpmVals = singleData.map(d => d.bpm);
     const duration = d3.max(singleData, d => d.time) - d3.min(singleData, d => d.time);
 
-    insightList.append("li").text(`Participant: ${selectedLineId}`);
-    insightList.append("li").text(`Technique: ${singleData[0].technique}`);
-    insightList.append("li").text(`Avg BPM: ${d3.mean(bpmVals).toFixed(1)}`);
-    insightList.append("li").text(`Min BPM: ${d3.min(bpmVals).toFixed(1)}`);
-    insightList.append("li").text(`Max BPM: ${d3.max(bpmVals).toFixed(1)}`);
-    insightList.append("li").text(`Duration: ${duration.toFixed(1)} seconds`);
+    insightList.append("li").html(`<strong>Participant:</strong> ${selectedLineId}`);
+    insightList.append("li").html(`<strong>Technique:</strong> ${singleData[0].technique}`);
+    insightList.append("li").html(`<strong>Avg BPM:</strong> ${d3.mean(bpmVals).toFixed(1)}`);
+    insightList.append("li").html(`<strong>Min BPM:</strong> ${d3.min(bpmVals).toFixed(1)}`);
+    insightList.append("li").html(`<strong>Max BPM:</strong> ${d3.max(bpmVals).toFixed(1)}`);
+    insightList.append("li").html(`<strong>Duration:</strong> ${duration.toFixed(1)} seconds`);
     return;
   }
 
@@ -279,10 +306,10 @@ function renderInsights() {
   const allBpms = filtered.map(d => d.bpm);
   const range = [d3.min(allBpms), d3.max(allBpms)];
 
-  insightList.append("li").text(`Number of participants: ${groupedByPerson.length}`);
-  insightList.append("li").text(`Heart rate range: ${range[0].toFixed(1)} - ${range[1].toFixed(1)} bpm`);
-  insightList.append("li").text(`Technique with highest average heart rate: ${highest.tech} (${highest.avg.toFixed(1)} bpm)`);
-  insightList.append("li").text(`Technique with lowest average heart rate: ${lowest.tech} (${lowest.avg.toFixed(1)} bpm)`);
+  insightList.append("li").html(`<strong>Number of Participants:</strong> ${groupedByPerson.length}`);
+  insightList.append("li").html(`<strong>Heart Rate Range:</strong> ${range[0].toFixed(1)} - ${range[1].toFixed(1)} bpm`);
+  insightList.append("li").html(`<strong>Avg Heart Rate (Max):</strong> ${highest.tech} (${highest.avg.toFixed(1)} bpm)`);
+  insightList.append("li").html(`<strong>Avg Heart Rate (Min):</strong> ${lowest.tech} (${lowest.avg.toFixed(1)} bpm)`);
 }
 
 function updateChart() {
@@ -361,8 +388,8 @@ function updateChart() {
     .style("cursor", "pointer")
     .attr("d", d => line(d[1]))
     .on("mouseover", function (event, d) {
-      if (selectedLineId !== null) return;
-
+      isHoveringLine = true;
+      
       g.selectAll(".person-line").transition().duration(200).attr("opacity", 0.1);
       g.selectAll(".person-line").filter(ld => ld[0] === d[0])
         .transition().duration(200)
@@ -377,7 +404,10 @@ function updateChart() {
         tooltipContent += `<strong>Gender:</strong> ${d[1][0].gender}<br/>`;
       }
       
-      tooltipContent += `<strong>${d[0].startsWith('avg') ? 'Average Line' : 'Person'}:</strong> ${d[0]}<br/>`;
+      // Only show Person ID when in individual mode, not in average mode
+      if (currentViewMode === "all") {
+        tooltipContent += `<strong>Person:</strong> ${d[0]}<br/>`;
+      }
       
       tooltip
         .style("display", "block")
@@ -412,7 +442,10 @@ function updateChart() {
         tooltipContent += `<strong>Gender:</strong> ${d[1][0].gender}<br/>`;
       }
       
-      tooltipContent += `<strong>${d[0].startsWith('avg') ? 'Average Line' : 'Person'}:</strong> ${d[0]}<br/>`;
+      // Only show Person ID when in individual mode, not in average mode
+      if (currentViewMode === "all") {
+        tooltipContent += `<strong>Person:</strong> ${d[0]}<br/>`;
+      }
       
       if (closestPoint) {
         tooltipContent += `<strong>Time:</strong> ${closestPoint.time.toFixed(0)}s<br/>`;
@@ -426,12 +459,18 @@ function updateChart() {
         .html(tooltipContent);
     })
     .on("mouseout", function () {
-      if (selectedLineId !== null) return;
-      g.selectAll(".person-line")
-        .transition().duration(300)
-        .attr("stroke-width", d => currentViewMode === "average" ? 3 : 1.8)
-        .attr("opacity", 0.7);
+      isHoveringLine = false;
+      
+      // Always hide the tooltip when mouse leaves a line
       tooltip.style("display", "none");
+      
+      // Only reset line styling if no line is selected
+      if (selectedLineId === null) {
+        g.selectAll(".person-line")
+          .transition().duration(300)
+          .attr("stroke-width", d => currentViewMode === "average" ? 3 : 1.8)
+          .attr("opacity", 0.7);
+      }
     })
     .on("click", function (event, d) {
       selectedLineId = d[0];
@@ -441,6 +480,14 @@ function updateChart() {
 
   hoverLines.transition().duration(750).attr("d", d => line(d[1]));
   hoverLines.exit().transition().duration(500).remove();
+
+  // Also add a mouseleave handler to the chart area to ensure tooltip is hidden
+  // when cursor moves outside of the chart but the event doesn't trigger mouseout
+  chartArea.on("mouseleave", function() {
+    if (!isHoveringLine) {
+      tooltip.style("display", "none");
+    }
+  });
 
   renderInsights();
   
